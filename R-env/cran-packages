@@ -12,4 +12,6 @@ r-cran-leaflet
 r-cran-nycflights13
 r-cran-duckdb
 r-cran-palmerpenguins
+r-cran-janitor
+r-cran-lahman
 
