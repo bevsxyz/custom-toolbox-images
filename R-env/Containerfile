@@ -1,0 +1,33 @@
+FROM ubuntu:22.04
+
+ENV NAME=ubuntu-toolbox VERSION=22.04
+LABEL com.github.containers.toolbox="true"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Singapore
+
+COPY README.md /
+
+COPY default /
+RUN apt-get update -qy && xargs -a default apt-get -qy install
+RUN rm /default
+
+RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+RUN add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/"
+
+COPY missing-docs /
+RUN apt-get update -qy && xargs -a missing-docs apt-get -qy install
+RUN rm /missing-docs
+
+COPY extra-packages /
+RUN apt-get update -qy && xargs -a extra-packages apt-get -qy install
+RUN rm /extra-packages
+
+RUN wget https://apache.jfrog.io/artifactory/arrow/ubuntu/apache-arrow-apt-source-latest-jammy.deb
+RUN wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2023.06.1-524-amd64.deb
+RUN apt install -y -V ./apache-arrow-apt-source-latest-jammy.deb ./rstudio-2023.06.1-524-amd64.deb
+
+
+COPY nsswitch.conf /etc/nsswitch.conf
+
+RUN apt-get -y clean
